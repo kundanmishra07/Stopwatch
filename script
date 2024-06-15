@@ -1,0 +1,85 @@
+let startTime, updateTime, elapsedTime = 0, timerInterval;
+let isRunning = false;
+let laps = [];
+
+const timeDisplay = document.querySelector('.time-display');
+const startButton = document.getElementById('start');
+const stopButton = document.getElementById('stop');
+const resetButton = document.getElementById('reset');
+const lapButton = document.getElementById('lap');
+const restartLapButton = document.getElementById('restart-lap');
+const lapsList = document.getElementById('laps');
+
+function timeToString(time) {
+    let diffInHrs = time / 3600000;
+    let hh = Math.floor(diffInHrs);
+
+    let diffInMin = (diffInHrs - hh) * 60;
+    let mm = Math.floor(diffInMin);
+
+    let diffInSec = (diffInMin - mm) * 60;
+    let ss = Math.floor(diffInSec);
+
+    
+
+    let formattedHH = hh.toString().padStart(2, '0');
+    let formattedMM = mm.toString().padStart(2, '0');
+    let formattedSS = ss.toString().padStart(2, '0');
+    
+   
+
+    return ${formattedHH}:${formattedMM}:${formattedSS};
+}
+
+function start() {
+    if (isRunning) return;
+    startTime = Date.now() - elapsedTime;
+    timerInterval = setInterval(function printTime() {
+        elapsedTime = Date.now() - startTime;
+        timeDisplay.innerHTML = timeToString(elapsedTime);
+    }, 1000);
+    isRunning = true;
+}
+
+function stop() {
+    clearInterval(timerInterval);
+    isRunning = false;
+}
+
+function reset() {
+    clearInterval(timerInterval);
+    timeDisplay.innerHTML = "00:00:00:00";
+    elapsedTime = 0;
+    laps = [];
+    renderLaps();
+    isRunning = false;
+}
+
+function lap() {
+    if (!isRunning) return;
+    laps.push(elapsedTime);
+    renderLaps();
+}
+
+function restartLap() {
+    if (!isRunning) return;
+    laps.push(elapsedTime);
+    renderLaps();
+    elapsedTime = 0;
+    startTime = Date.now();
+}
+
+function renderLaps() {
+    lapsList.innerHTML = '';
+    laps.forEach((lap, index) => {
+        const lapElement = document.createElement('li');
+        lapElement.innerText = Lap ${index + 1}: ${timeToString(lap)};
+        lapsList.appendChild(lapElement);
+    });
+}
+
+startButton.addEventListener('click', start);
+stopButton.addEventListener('click', stop);
+resetButton.addEventListener('click', reset);
+lapButton.addEventListener('click', lap);
+restartLapButton.addEventListener('click', restartLap);
